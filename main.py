@@ -12,7 +12,7 @@ import traceback
 import random
 
 from discord import File
-from discord.utils import utcnow
+from discord.utils import utcnow, snowflake_time
 from discord.ext.tasks import loop
 from snitchvis import (Event, InvalidEventException, SnitchVisRecord,
     create_users, snitches_from_events, Snitch, Config, SnitchVisImage)
@@ -28,6 +28,8 @@ from client import Client
 
 INVITE_LINK = ("https://discord.com/oauth2/authorize?client_id="
     "999808708131426434&permissions=0&scope=bot")
+
+CIVMC_LAUNCH_DATE = datetime.strptime("06/01/2022", "%m/%d/%Y").date()
 
 def run_snitch_vis(*args):
     vis = SnitchVisRecord(*args)
@@ -322,6 +324,10 @@ class Snitchvis(Client):
             # don't index past the last indexed message id (if we have such
             # an id stored)
             if last_id and message_.id <= last_id:
+                break
+
+            # if message is from before civmc launch date
+            if snowflake_time(message_.id).date() < CIVMC_LAUNCH_DATE:
                 break
 
             try:
